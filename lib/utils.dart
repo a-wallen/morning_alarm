@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
 // UI constants for the application i.e colors etc
 const primaryColor = const Color(0xFFFF8961);
@@ -28,4 +27,12 @@ double screenWidth(BuildContext context,
 }
 
 // time
+class CurrentTime {
+  //data types
+  final int seconds;
+  final int minutes;
+  final int hours;
+  //constructor
+  CurrentTime(this.seconds,this.minutes,this.hours);
+}
 
