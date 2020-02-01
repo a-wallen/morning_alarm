@@ -17,37 +17,42 @@ class _HomePageState extends State<HomePage> {
     Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
         DateTime now = DateTime.now();
-        String date = DateFormat('kk:mm:ss \n EEE d MMM').format(now);
+        String date = DateFormat('kk:mm \n EEE d MMM').format(now);
       });
     });
   }
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
-    String date = DateFormat('kk:mm:ss \n EEE d MMM').format(now);
+    String date = DateFormat('kk:mm \n EEE d MMM').format(now);
     return Container(
-      color: Colors.white70,
+      color: Colors.white30,
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              date,
-              style: TextStyle(
+        child: Container(
+          color:Colors.blue,
+          margin: new EdgeInsets.fromLTRB(0, 200.0, 0, 200.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                date,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 24.0,
+                ),
+              ),
+              FlatButton(
                 color: Colors.black54,
-                fontSize: 24.0,
+                child: Icon(
+                  Icons.alarm,
+                  color: Colors.white,
+                ),
+                onPressed: null,
               ),
-            ),
-            FlatButton(
-              color: Colors.black54,
-              child: Icon(
-                Icons.alarm,
-                color: Colors.white,
-              ),
-              onPressed: null,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
