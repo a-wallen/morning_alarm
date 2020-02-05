@@ -1,5 +1,20 @@
 import 'package:flutter/material.dart';
 
+const HOUR_SIZE = 96.0;
+const SECOND_SIZE = 32.0;
+const Color HOUR_COLOR = Colors.black54;
+const Color SECOND_COLOR = Colors.redAccent;
+
+TextStyle timeStyle(double size, Color myColor) {
+  return TextStyle(
+    //color: Colors.black54,
+    //TODO this is just a suggestion
+    color: myColor,
+    fontFamily: 'BebasNeue',
+    fontSize: size,
+  );
+}
+
 // UI constants for the application i.e colors etc
 const primaryColor = const Color(0xFFFF8961);
 
@@ -33,6 +48,5 @@ class CurrentTime {
   final int minutes;
   final int hours;
   //constructor
-  CurrentTime(this.seconds,this.minutes,this.hours);
+  CurrentTime(this.seconds, this.minutes, this.hours);
 }
-

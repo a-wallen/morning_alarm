@@ -3,6 +3,15 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:morning_alarm/utils.dart';
 
+//these steps will have to run on dummy alarm data
+//TODO implement push notifications triggered by alarm
+//TODO have app run in background
+
+//TODO enable user to enter their own alarm
+//TODO show user set alarm on UI
+
+//TODO performance optimization!
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -12,42 +21,77 @@ class _HomePageState extends State<HomePage> {
   Timer timer;
   DateTime now;
   String date;
+  String hours;
+  String minutes;
+  String seconds;
   void initState() {
     super.initState();
     Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
         DateTime now = DateTime.now();
-        String date = DateFormat('kk:mm \n EEE d MMM').format(now);
+        date = DateFormat('EEE d MMM').format(now);
+        hours = DateFormat('kk').format(now);
+        minutes = DateFormat('mm').format(now);
+        seconds = DateFormat('ss').format(now);
       });
     });
   }
+
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    String date = DateFormat('kk:mm \n EEE d MMM').format(now);
-    return Container(
-      color: Colors.white30,
-      child: Center(
+    return Scaffold(
+      body: Center(
         child: Container(
-          color:Colors.blue,
-          margin: new EdgeInsets.fromLTRB(0, 200.0, 0, 200.0),
+          margin: EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(10.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text(
-                date,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 24.0,
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    hours,
+                    style: timeStyle(HOUR_SIZE, HOUR_COLOR),
+                  ),
+                  Text(
+                    ':',
+                    style:  timeStyle(HOUR_SIZE, HOUR_COLOR),
+                  ),
+                  Text(
+                    minutes,
+                    style:  timeStyle(HOUR_SIZE, HOUR_COLOR),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            ':',
+                            style:  timeStyle(SECOND_SIZE, SECOND_COLOR),
+                          ),
+                          // TODO: You may remove the seconds (using for testing)
+                          Text(
+                            seconds,
+                            style:  timeStyle(SECOND_SIZE, SECOND_COLOR),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        date,
+                        style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+                      ),
+                    ],
+                  ),
+                ],
               ),
               FlatButton(
                 color: Colors.black54,
                 child: Icon(
                   Icons.alarm,
-                  color: Colors.white,
+                  color: SECOND_COLOR,
                 ),
                 onPressed: null,
               ),
