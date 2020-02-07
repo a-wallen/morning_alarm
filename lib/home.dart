@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:morning_alarm/utils.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 //these steps will have to run on dummy alarm data
 //TODO implement push notifications triggered by alarm
@@ -19,20 +20,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Timer timer;
-  DateTime now;
-  String date;
-  String hours;
-  String minutes;
-  String seconds;
+  DateTime now = DateTime.now();
+  int alarmMinutes=30, alarmHours=7; // alarm target times
+  String date, hours, minutes, seconds; // current time
   void initState() {
     super.initState();
     Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
-        DateTime now = DateTime.now();
+        now = DateTime.now();
         date = DateFormat('EEE d MMM').format(now);
+        seconds = DateFormat('ss').format(now);
         hours = DateFormat('kk').format(now);
         minutes = DateFormat('mm').format(now);
-        seconds = DateFormat('ss').format(now);
       });
     });
   }
@@ -52,32 +51,15 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    hours,
+                    "$hours:$minutes",
                     style: timeStyle(HOUR_SIZE, HOUR_COLOR),
-                  ),
-                  Text(
-                    ':',
-                    style:  timeStyle(HOUR_SIZE, HOUR_COLOR),
-                  ),
-                  Text(
-                    minutes,
-                    style:  timeStyle(HOUR_SIZE, HOUR_COLOR),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text(
-                            ':',
-                            style:  timeStyle(SECOND_SIZE, SECOND_COLOR),
-                          ),
-                          // TODO: You may remove the seconds (using for testing)
-                          Text(
-                            seconds,
-                            style:  timeStyle(SECOND_SIZE, SECOND_COLOR),
-                          ),
-                        ],
+                      Text(
+                        ":$seconds",
+                        style: timeStyle(SECOND_SIZE, SECOND_COLOR),
                       ),
                       Text(
                         date,
@@ -95,6 +77,10 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onPressed: null,
               ),
+//              Text(
+//                "Alarm at: $alarmHours:$alarmMinutes",
+//                style: timeStyle(32.0, Colors.black54),
+//              ),
             ],
           ),
         ),
