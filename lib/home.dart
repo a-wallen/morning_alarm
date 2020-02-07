@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:morning_alarm/get_alarm.dart';
 import 'package:morning_alarm/utils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -69,6 +70,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+              Text(
+                "Alarm at: $alarmHours:$alarmMinutes",
+                style: timeStyle(SECOND_SIZE, Colors.black54),
+              ),
+              TimeSelector(),
               FlatButton(
                 color: Colors.black54,
                 child: Icon(
@@ -77,10 +83,6 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onPressed: null,
               ),
-//              Text(
-//                "Alarm at: $alarmHours:$alarmMinutes",
-//                style: timeStyle(32.0, Colors.black54),
-//              ),
             ],
           ),
         ),
