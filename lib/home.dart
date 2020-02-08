@@ -75,13 +75,19 @@ class _HomePageState extends State<HomePage> {
                 style: timeStyle(SECOND_SIZE, Colors.black54),
               ),
               TimeSelector(),
-              FlatButton(
-                color: Colors.black54,
-                child: Icon(
-                  Icons.alarm,
-                  color: SECOND_COLOR,
-                ),
-                onPressed: null,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Text("Set", style: timeStyle(12.0, SECOND_COLOR),),
+                  FlatButton(
+                    child: Icon(
+                      Icons.alarm,
+                      color: SECOND_COLOR,
+                    ),
+                    onPressed: null,
+                  ),
+                  Text("Alarm", style: timeStyle(12.0, SECOND_COLOR),),
+                ],
               ),
             ],
           ),
