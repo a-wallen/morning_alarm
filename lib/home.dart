@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
-import 'package:morning_alarm/get_alarm.dart';
 import 'package:morning_alarm/utils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -22,8 +21,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Timer timer;
   DateTime now = DateTime.now();
-  //DateTime alarmTest;
-  int alarmMinutes=30, alarmHours=7; // alarm target times
+  int myhours = 0, myminutes = 0;
+  int setHours = 0, setMinutes = 0;
   String date, hours, minutes, seconds; // current time
   FlutterLocalNotificationsPlugin alarmNotificationPlugin; //alarm
 
@@ -32,12 +31,12 @@ class _HomePageState extends State<HomePage> {
 
     //alarm notification plugin initialization
     var initializationSettingsAndroid =
-      new AndroidInitializationSettings('@mipmap/ic_launcher');
+        new AndroidInitializationSettings('@mipmap/ic_launcher');
     var initializationSettingsIOS = new IOSInitializationSettings();
-    var initializationSettings = new InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
     alarmNotificationPlugin = new FlutterLocalNotificationsPlugin();
     alarmNotificationPlugin.initialize(initializationSettings);
-
 
     Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
@@ -51,33 +50,113 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _setAlarm() async{
+  void _sendAlarm() async {
     //Currently doesn't work with this code to schedule alarm ten seconds in advance
     //commented out code by itself works to make it send a notification as soon as function is called
     var alarmTime = DateTime.now().add(new Duration(seconds: 10));
-    var androidPlatformChannelSpecifics =
-    new AndroidNotificationDetails('your other channel id',
-        'your other channel name', 'your other channel description');
-    var iOSPlatformChannelSpecifics =
-    new IOSNotificationDetails();
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+        'your other channel id',
+        'your other channel name',
+        'your other channel description');
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
     NotificationDetails platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await alarmNotificationPlugin.schedule(0,
-    'scheduled title',
-    'scheduled body',
-    alarmTime,
-    platformChannelSpecifics);
+//    await alarmNotificationPlugin.schedule(0, 'scheduled title',
+//        'scheduled body', alarmTime, platformChannelSpecifics);
 
-    /*showDialog(
-      context: context,
-      builder: (_) {
-        return new AlertDialog(
-          title: Text("PayLoad"),
-          content: Text("Payload : lol"),
-        );
-      },
-    );*/
+//    showDialog(
+//      context: context,
+//      builder: (_) {
+//        return new AlertDialog(
+//          title: Text("PayLoad"),
+//          content: Text("Payload : lol"),
+//        );
+//      },
+//    );
+  }
 
+  _setAlarmTime() {
+    setState(() {
+      setHours = myhours;
+      setMinutes = myminutes;
+    });
+  }
+
+  hoursUpdate(DragUpdateDetails details) {
+    setState(() {
+      if (myhours - details.primaryDelta.round() < 0)
+        myhours += 23;
+      else if (myhours - details.primaryDelta.round() > 23)
+        myhours -= 23;
+      else
+        myhours -= details.primaryDelta.round();
+    });
+  }
+
+  minutesUpdate(DragUpdateDetails details) {
+    setState(() {
+      if (myminutes - details.primaryDelta.round() < 0)
+        myminutes += 59;
+      else if (myminutes - details.primaryDelta.round() > 59)
+        myminutes -= 59;
+      else
+        myminutes -= details.primaryDelta.round();
+    });
+  }
+
+  Widget timeSelector() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        tsSliver(myhours, hoursUpdate),
+        Text(
+          ':',
+          style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+        ),
+        tsSliver(myminutes, minutesUpdate),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Text(
+              "Set",
+              style: timeStyle(12.0, HOUR_COLOR),
+            ),
+            IconButton(
+              iconSize: SECOND_SIZE,
+              color: SECOND_COLOR,
+              icon: Icon(Icons.access_alarm),
+              onPressed: _setAlarmTime,
+            ),
+            Text(
+              "Alarm",
+              style: timeStyle(12.0, HOUR_COLOR),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget tsSliver(int t, Function f) {
+    return Column(
+      children: <Widget>[
+        Icon(
+          Icons.arrow_drop_up,
+          color: HOUR_COLOR,
+        ),
+        GestureDetector(
+          child: Text(
+            "$t",
+            style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+          ),
+          onVerticalDragUpdate: (d) => f(d),
+        ),
+        Icon(
+          Icons.arrow_drop_down,
+          color: HOUR_COLOR,
+        ),
+      ],
+    );
   }
 
   @override
@@ -113,34 +192,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+              timeSelector(),
               Text(
-                "Alarm at: $alarmHours:$alarmMinutes",
-                style: timeStyle(SECOND_SIZE, Colors.black54),
-              ),
-              TimeSelector(),
-<<<<<<< HEAD
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Text("Set", style: timeStyle(12.0, SECOND_COLOR),),
-                  FlatButton(
-                    child: Icon(
-                      Icons.alarm,
-                      color: SECOND_COLOR,
-                    ),
-                    onPressed: null,
-                  ),
-                  Text("Alarm", style: timeStyle(12.0, SECOND_COLOR),),
-                ],
-=======
-              FlatButton(
-                color: Colors.black54,
-                child: Icon(
-                  Icons.alarm,
-                  color: SECOND_COLOR,
-                ),
-                onPressed: _setAlarm,
->>>>>>> a3041a679fd392856c66c12c722dc38dd5c9606a
+                "Next alarm at: $setHours:$setMinutes",
+                style: timeStyle(12.0, SECOND_COLOR),
               ),
             ],
           ),

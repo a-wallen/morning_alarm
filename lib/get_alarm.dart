@@ -7,47 +7,40 @@ class TimeSelector extends StatefulWidget {
 }
 
 class _TimeSelectorState extends State<TimeSelector> {
-  int hours = 0;
-  int minutes = 0;
-
-  hoursUpdate(DragUpdateDetails details) {
-    setState(() {
-      if(hours-details.primaryDelta.round() < 0)
-        hours += 23;
-      else if(hours-details.primaryDelta.round() > 23)
-        hours -= 23;
-      else
-        hours -= details.primaryDelta.round();
-    });
-      print(hours);
-  }
-
-  minutesUpdate(DragUpdateDetails details){
-    setState(() {
-      if(minutes-details.primaryDelta.round() < 0)
-        minutes += 59;
-      else if(minutes-details.primaryDelta.round() > 59)
-        minutes -= 59;
-      else
-        minutes -= details.primaryDelta.round();
-    });
-  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget timeSelector() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        tsSliver(hours, hoursUpdate),
+        tsSliver(myhours, hoursUpdate),
         Text(
           ':',
           style: timeStyle(SECOND_SIZE, SECOND_COLOR),
         ),
-        tsSliver(minutes, minutesUpdate),
+        tsSliver(myminutes, minutesUpdate),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Text(
+              "Set",
+              style: timeStyle(12.0, HOUR_COLOR),
+            ),
+            IconButton(
+              iconSize: SECOND_SIZE,
+              color: SECOND_COLOR,
+              icon: Icon(Icons.access_alarm),
+              onPressed: _setTime,
+            ),
+            Text(
+              "Alarm",
+              style: timeStyle(12.0, HOUR_COLOR),
+            ),
+          ],
+        ),
       ],
     );
   }
-
   Widget tsSliver(int t, Function f) {
     return Column(
       children: <Widget>[
