@@ -21,14 +21,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Timer timer;
   DateTime now = DateTime.now();
+  Time alarm = Time(0, 0, 0);
+  String alarmAsString = '';
   int myhours = 0, myminutes = 0;
-  int setHours = 0, setMinutes = 0;
   String date, hours, minutes, seconds; // current time
   FlutterLocalNotificationsPlugin alarmNotificationPlugin; //alarm
 
   void initState() {
     super.initState();
-
     //alarm notification plugin initialization
     var initializationSettingsAndroid =
         new AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -37,48 +37,56 @@ class _HomePageState extends State<HomePage> {
         initializationSettingsAndroid, initializationSettingsIOS);
     alarmNotificationPlugin = new FlutterLocalNotificationsPlugin();
     alarmNotificationPlugin.initialize(initializationSettings);
-
+    date = DateFormat('EEE d MMM').format(now);
+    seconds = DateFormat('ss').format(now);
+    hours = DateFormat('kk').format(now);
+    minutes = DateFormat('mm').format(now);
     Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
         now = DateTime.now();
         //alarmTest = DateTime(now.year, now.month, now.day, now.hour, now.minute+1);
-        date = DateFormat('EEE d MMM').format(now);
         seconds = DateFormat('ss').format(now);
         hours = DateFormat('kk').format(now);
         minutes = DateFormat('mm').format(now);
       });
+      if(alarmAsString=='$hours:$minutes:$seconds'){
+        _sendAlarm();
+      }
     });
   }
 
-  void _sendAlarm() async {
+  Future _sendAlarm() async {
     //Currently doesn't work with this code to schedule alarm ten seconds in advance
     //commented out code by itself works to make it send a notification as soon as function is called
-    var alarmTime = DateTime.now().add(new Duration(seconds: 10));
+
+    //var alarmTime = DateTime.now().add(new Duration(seconds: 10));
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
         'your other channel id',
         'your other channel name',
         'your other channel description');
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-    NotificationDetails platformChannelSpecifics = new NotificationDetails(
+    var platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-//    await alarmNotificationPlugin.schedule(0, 'scheduled title',
+    await alarmNotificationPlugin.showDailyAtTime(
+        0, 'title', 'body', alarm, platformChannelSpecifics);
+    // await alarmNotificationPlugin.schedule(id, title, body, scheduledDate, notificationDetails)
+    //    await alarmNotificationPlugin.schedule(0, 'scheduled title',
 //        'scheduled body', alarmTime, platformChannelSpecifics);
-
-//    showDialog(
-//      context: context,
-//      builder: (_) {
-//        return new AlertDialog(
-//          title: Text("PayLoad"),
-//          content: Text("Payload : lol"),
-//        );
-//      },
-//    );
+    showDialog(
+      context: context,
+      builder: (_) {
+        return new AlertDialog(
+          title: Text("PayLoad"),
+          content: Text("Payload : lol"),
+        );
+      },
+    );
   }
 
   _setAlarmTime() {
     setState(() {
-      setHours = myhours;
-      setMinutes = myminutes;
+      alarm = Time(myhours, myminutes, 0);
+      alarmAsString = '$myhours:$myminutes:00';
     });
   }
 
@@ -194,7 +202,7 @@ class _HomePageState extends State<HomePage> {
               ),
               timeSelector(),
               Text(
-                "Next alarm at: $setHours:$setMinutes",
+                "Next alarm at: $alarmAsString",
                 style: timeStyle(12.0, SECOND_COLOR),
               ),
             ],
