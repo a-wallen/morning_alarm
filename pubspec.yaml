@@ -16,7 +16,8 @@ dependencies:
   workmanager: ^0.2.0
   flutter_launcher_icons: "^0.7.3"
   flutter_local_notifications:
-
+  weather: 0.9.5
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

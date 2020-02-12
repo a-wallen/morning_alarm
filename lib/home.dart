@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:morning_alarm/utils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:weather/weather.dart';
 
 //these steps will have to run on dummy alarm data
 //TODO implement push notifications triggered by alarm
@@ -19,16 +21,31 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  //Weather classes from the weather library
+  WeatherStation weatherStation =
+      WeatherStation("6a2c0c137802dededc82292b586c8d15");
+  Weather weather;
+  String weatherIconUrl;
+
+  //Timer for UI redrawing
   Timer timer;
   DateTime now = DateTime.now();
+  int sunrise, sunset, midDay;
+
+  //var alarm of type time used for local notifications class
   Time alarm = Time(0, 0, 0);
   String alarmAsString = '';
   int myhours = 0, myminutes = 0;
+
+  //current time variables
   String date, hours, minutes, seconds; // current time
+
+  //instance of flutter local notification plugin
   FlutterLocalNotificationsPlugin alarmNotificationPlugin; //alarm
 
   void initState() {
     super.initState();
+    _getWeather();
     //alarm notification plugin initialization
     var initializationSettingsAndroid =
         new AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -49,9 +66,21 @@ class _HomePageState extends State<HomePage> {
         hours = DateFormat('kk').format(now);
         minutes = DateFormat('mm').format(now);
       });
-      if(alarmAsString=='$hours:$minutes:$seconds'){
+      if (alarmAsString == '$hours:$minutes:$seconds') {
         _sendAlarm();
       }
+    });
+  }
+
+  Future _getWeather() async {
+    weather = await weatherStation.currentWeather();
+    setState(() {
+      sunrise = 60 * int.parse(DateFormat('kk').format(weather.sunrise)) +
+          int.parse(DateFormat('mm').format(weather.sunrise));
+      sunset = 60 * int.parse(DateFormat('kk').format(weather.sunset)) +
+          int.parse(DateFormat('mm').format(weather.sunrise));
+      midDay = ((sunrise + sunset) / 2).round();
+      weatherIconUrl = weather.weatherIcon;
     });
   }
 
@@ -172,19 +201,47 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Center(
         child: Container(
-          margin: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0x099217FF), Colors.white]),
+          ),
           padding: EdgeInsets.all(10.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text(
-                    "$hours:$minutes",
-                    style: timeStyle(HOUR_SIZE, HOUR_COLOR),
-                  ),
+                  Stack(overflow: Overflow.visible, children: <Widget>[
+                    Text(
+                      "$hours:$minutes",
+                      style: timeStyle(HOUR_SIZE, HOUR_COLOR),
+                    ),
+                    weatherIconUrl == null
+                        ? CircularProgressIndicator()
+                        : Positioned(
+                            top: -10.0,
+                            right: -25.0,
+                            child: Stack(
+                              overflow: Overflow.visible,
+                              children: <Widget>[
+                                Positioned(
+                                  child: Text(
+                                    "70°",
+                                    style: timeStyle(10.0, SECOND_COLOR),
+                                  ),
+                                ),
+                                Image.network(
+                                  "http://openweathermap.org/img/wn/$weatherIconUrl@2x.png",
+                                  height: SECOND_SIZE + 5,
+                                ),
+                              ],
+                            ),
+                          ),
+                  ]),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
