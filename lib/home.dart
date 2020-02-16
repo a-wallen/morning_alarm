@@ -92,12 +92,13 @@ class _HomePageState extends State<HomePage> {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
         'your other channel id',
         'your other channel name',
-        'your other channel description');
+        'your other channel description',
+        importance: Importance.Max, priority: Priority.High);
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
     var platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await alarmNotificationPlugin.showDailyAtTime(
-        0, 'title', 'body', alarm, platformChannelSpecifics);
+    await alarmNotificationPlugin.show(
+        0, 'title', 'body', platformChannelSpecifics);
     // await alarmNotificationPlugin.schedule(id, title, body, scheduledDate, notificationDetails)
     //    await alarmNotificationPlugin.schedule(0, 'scheduled title',
 //        'scheduled body', alarmTime, platformChannelSpecifics);
