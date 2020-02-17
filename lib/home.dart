@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:morning_alarm/utils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:weather/weather.dart';
+import 'bottomSheetElements.dart';
 
 //these steps will have to run on dummy alarm data
 //TODO implement push notifications triggered by alarm
@@ -93,7 +94,12 @@ class _HomePageState extends State<HomePage> {
         'your other channel id',
         'your other channel name',
         'your other channel description',
-        importance: Importance.Max, priority: Priority.High);
+        importance: Importance.Max,
+        sound: "assets/flappy_bird.mp3",
+        playSound: true,
+        enableVibration: true,
+        icon: "assets/morning_alarm_icon.png",
+        priority: Priority.High);
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
     var platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
@@ -102,15 +108,16 @@ class _HomePageState extends State<HomePage> {
     // await alarmNotificationPlugin.schedule(id, title, body, scheduledDate, notificationDetails)
     //    await alarmNotificationPlugin.schedule(0, 'scheduled title',
 //        'scheduled body', alarmTime, platformChannelSpecifics);
-    showDialog(
-      context: context,
-      builder: (_) {
-        return new AlertDialog(
-          title: Text("PayLoad"),
-          content: Text("Payload : lol"),
-        );
-      },
-    );
+
+//    showDialog(
+//      context: context,
+//      builder: (_) {
+//        return new AlertDialog(
+//          title: Text("PayLoad"),
+//          content: Text("Payload : lol"),
+//        );
+//      },
+//    );
   }
 
   _setAlarmTime() {
@@ -200,50 +207,41 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0x099217FF), Colors.white]),
-          ),
-          padding: EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+      backgroundColor: Colors.white,
+      body: Builder(
+        builder: (context) => Stack(
+          children: <Widget>[
+            Positioned(
+              top: 30.0,
+              right: 0.0,
+              child: weatherIconUrl == null
+                  ? CircularProgressIndicator()
+                  : Stack(
+                      overflow: Overflow.visible,
+                      children: <Widget>[
+                        Positioned(
+                          child: Text(
+                            "70°",
+                            style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+                          ),
+                        ),
+                        Image.network(
+                          "http://openweathermap.org/img/wn/$weatherIconUrl@2x.png",
+                          height: HOUR_SIZE,
+                        ),
+                      ],
+                    ),
+            ),
+            Center(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Stack(overflow: Overflow.visible, children: <Widget>[
-                    Text(
-                      "$hours:$minutes",
-                      style: timeStyle(HOUR_SIZE, HOUR_COLOR),
-                    ),
-                    weatherIconUrl == null
-                        ? CircularProgressIndicator()
-                        : Positioned(
-                            top: -10.0,
-                            right: -25.0,
-                            child: Stack(
-                              overflow: Overflow.visible,
-                              children: <Widget>[
-                                Positioned(
-                                  child: Text(
-                                    "70°",
-                                    style: timeStyle(10.0, SECOND_COLOR),
-                                  ),
-                                ),
-                                Image.network(
-                                  "http://openweathermap.org/img/wn/$weatherIconUrl@2x.png",
-                                  height: SECOND_SIZE + 5,
-                                ),
-                              ],
-                            ),
-                          ),
-                  ]),
+                  Text(
+                    "$hours:$minutes",
+                    style: timeStyle(HOUR_SIZE, HOUR_COLOR),
+                  ),
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
@@ -258,13 +256,35 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              timeSelector(),
-              Text(
+            ),
+            Positioned(
+              bottom: 15.0,
+              left: screenWidth(context, dividedBy: 2, reducedBy: 5.0),
+              child: FlatButton(
+                color: Colors.white,
+                padding: EdgeInsets.all(5.0),
+                child: Icon(Icons.arrow_drop_up),
+                onPressed: () {
+                  showBottomSheet(
+                      context: context,
+                      builder: (context) => Container(
+                            height: screenHeight(context, dividedBy: 4.5),
+                            color: Colors.grey,
+                            padding: EdgeInsets.all(10.0),
+                            child: Center(child: timeSelector()),
+                          ));
+                },
+              ),
+            ),
+            Positioned(
+              top: 30.0,
+              left: 10.0,
+              child: Text(
                 "Next alarm at: $alarmAsString",
                 style: timeStyle(12.0, SECOND_COLOR),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
