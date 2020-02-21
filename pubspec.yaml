@@ -23,15 +23,16 @@ dev_dependencies:
     sdk: flutter
 
 flutter_icons:
-  image_path_android: "assets/morning_alarm_icon.png"
-  image_path_ios: "assets/morning_alarm_icon.png"
+  image_path_android: "assets/app_icon.png"
+  image_path_ios: "assets/app_icon.png"
   android: true
   ios: true
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/morning_alarm_icon.png
+    - assets/app_icon.png
+    - assets/game_ringtone.wav
 
   fonts:
     - family: BebasNeue

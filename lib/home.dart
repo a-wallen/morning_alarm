@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:morning_alarm/utils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:weather/weather.dart';
-import 'bottomSheetElements.dart';
+import 'dart:typed_data';
+import 'main.dart';
+import 'dart:async';
 
 //these steps will have to run on dummy alarm data
 //TODO implement push notifications triggered by alarm
@@ -31,10 +33,10 @@ class _HomePageState extends State<HomePage> {
   //Timer for UI redrawing
   Timer timer;
   DateTime now = DateTime.now();
-  int sunrise, sunset, midDay;
+  int temp;
+//  int sunrise, sunset, midDay;
 
   //var alarm of type time used for local notifications class
-  Time alarm = Time(0, 0, 0);
   String alarmAsString = '';
   int myhours = 0, myminutes = 0;
 
@@ -42,19 +44,12 @@ class _HomePageState extends State<HomePage> {
   String date, hours, minutes, seconds; // current time
 
   //instance of flutter local notification plugin
-  FlutterLocalNotificationsPlugin alarmNotificationPlugin; //alarm
 
   void initState() {
     super.initState();
     _getWeather();
+
     //alarm notification plugin initialization
-    var initializationSettingsAndroid =
-        new AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettingsIOS = new IOSInitializationSettings();
-    var initializationSettings = new InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
-    alarmNotificationPlugin = new FlutterLocalNotificationsPlugin();
-    alarmNotificationPlugin.initialize(initializationSettings);
     date = DateFormat('EEE d MMM').format(now);
     seconds = DateFormat('ss').format(now);
     hours = DateFormat('kk').format(now);
@@ -67,100 +62,121 @@ class _HomePageState extends State<HomePage> {
         hours = DateFormat('kk').format(now);
         minutes = DateFormat('mm').format(now);
       });
-      if (alarmAsString == '$hours:$minutes:$seconds') {
-        _sendAlarm();
-      }
+//      if ('$alarmAsString:00' == '$hours:$minutes:$seconds') {
+//        _setAlarm(now);
+//      }
     });
   }
 
   Future _getWeather() async {
     weather = await weatherStation.currentWeather();
     setState(() {
-      sunrise = 60 * int.parse(DateFormat('kk').format(weather.sunrise)) +
-          int.parse(DateFormat('mm').format(weather.sunrise));
-      sunset = 60 * int.parse(DateFormat('kk').format(weather.sunset)) +
-          int.parse(DateFormat('mm').format(weather.sunrise));
-      midDay = ((sunrise + sunset) / 2).round();
+//      sunrise = 60 * int.parse(DateFormat('kk').format(weather.sunrise)) +
+//          int.parse(DateFormat('mm').format(weather.sunrise));
+//      sunset = 60 * int.parse(DateFormat('kk').format(weather.sunset)) +
+//          int.parse(DateFormat('mm').format(weather.sunrise));
+//      midDay = ((sunrise + sunset) / 2).round();
+      temp = weather.temperature.fahrenheit.round();
       weatherIconUrl = weather.weatherIcon;
     });
   }
 
-  Future _sendAlarm() async {
+  void _setAlarmTime() {
+    String alarmForDT;
+    setState(() {
+      if (myminutes < 10) {
+        alarmAsString = '${myhours}:0${myminutes}';
+        alarmForDT = '${myhours}0${myminutes}';
+      }else {
+        alarmAsString = '${myhours}:${myminutes}';
+        alarmForDT = '${myhours}${myminutes}';
+      }
+    });
+    String dateWithT = "${DateFormat('yyyyMMdd').format(now)}T${alarmForDT}00";
+    //print(dateWithT);
+    DateTime alarm = DateTime.parse(dateWithT);
+    _scheduleAlarm(alarm);
+  }
+
+  Future _scheduleAlarm(DateTime t) async {
     //Currently doesn't work with this code to schedule alarm ten seconds in advance
     //commented out code by itself works to make it send a notification as soon as function is called
-
-    //var alarmTime = DateTime.now().add(new Duration(seconds: 10));
+    var vibrationPattern = Int64List(4);
+    vibrationPattern[0] = 0;
+    vibrationPattern[1] = 1000;
+    vibrationPattern[2] = 5000;
+    vibrationPattern[3] = 2000;
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
         'your other channel id',
         'your other channel name',
         'your other channel description',
-        importance: Importance.Max,
-        sound: "assets/flappy_bird.mp3",
-        playSound: true,
         enableVibration: true,
-        icon: "assets/morning_alarm_icon.png",
-        priority: Priority.High);
+        vibrationPattern: vibrationPattern,
+        playSound: true,
+        sound: 'game_ringtone',
+        importance: Importance.Max,
+        priority: Priority.Max,
+        );
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
     var platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await alarmNotificationPlugin.show(
-        0, 'title', 'body', platformChannelSpecifics);
-    // await alarmNotificationPlugin.schedule(id, title, body, scheduledDate, notificationDetails)
-    //    await alarmNotificationPlugin.schedule(0, 'scheduled title',
-//        'scheduled body', alarmTime, platformChannelSpecifics);
+//    await alarmNotificationPlugin.show(
+//        0, alarmTitle, alarmBody, platformChannelSpecifics);
+    await alarmNotificationPlugin.cancelAll();
+    await alarmNotificationPlugin.schedule(
+        0, alarmTitle, alarmBody, t, platformChannelSpecifics);
 
-//    showDialog(
-//      context: context,
-//      builder: (_) {
-//        return new AlertDialog(
-//          title: Text("PayLoad"),
-//          content: Text("Payload : lol"),
-//        );
-//      },
-//    );
+    showDialog(
+      context: context,
+      builder: (_) {
+        return new AlertDialog(
+          title: Text("Success"),
+          content: Text("Scheduled an alarm at: ${myhours}:${myminutes}"),
+        );
+      },
+    );
   }
 
-  _setAlarmTime() {
-    setState(() {
-      alarm = Time(myhours, myminutes, 0);
-      alarmAsString = '$myhours:$myminutes:00';
-    });
-  }
-
+  /// Updates the hours
   hoursUpdate(DragUpdateDetails details) {
     setState(() {
-      if (myhours - details.primaryDelta.round() < 0)
+      final int update = (details.primaryDelta / SCROLL_FACTOR).round();
+      if (myhours - update < 0)
         myhours += 23;
-      else if (myhours - details.primaryDelta.round() > 23)
+      else if (myhours - update > 23)
         myhours -= 23;
       else
-        myhours -= details.primaryDelta.round();
+        myhours -= update;
     });
   }
 
+  ///Updates the minutes
   minutesUpdate(DragUpdateDetails details) {
     setState(() {
-      if (myminutes - details.primaryDelta.round() < 0)
+      final int update = (details.primaryDelta / SCROLL_FACTOR).round();
+      if (myminutes - update < 0)
         myminutes += 59;
-      else if (myminutes - details.primaryDelta.round() > 59)
+      else if (myminutes - update > 59)
         myminutes -= 59;
       else
-        myminutes -= details.primaryDelta.round();
+        myminutes -= update;
     });
   }
 
+  /// Overall time selector widget
   Widget timeSelector() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         tsSliver(myhours, hoursUpdate),
         Text(
           ':',
-          style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+          style: timeStyle(SECOND_SIZE, HOUR_COLOR),
         ),
         tsSliver(myminutes, minutesUpdate),
         Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
               "Set",
@@ -182,8 +198,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  /// Time selector wheel widget
   Widget tsSliver(int t, Function f) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Icon(
           Icons.arrow_drop_up,
@@ -191,7 +210,7 @@ class _HomePageState extends State<HomePage> {
         ),
         GestureDetector(
           child: Text(
-            "$t",
+            t < 10 ? '0$t' : '$t',
             style: timeStyle(SECOND_SIZE, SECOND_COLOR),
           ),
           onVerticalDragUpdate: (d) => f(d),
@@ -207,85 +226,70 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Builder(
-        builder: (context) => Stack(
-          children: <Widget>[
-            Positioned(
-              top: 30.0,
-              right: 0.0,
-              child: weatherIconUrl == null
-                  ? CircularProgressIndicator()
-                  : Stack(
-                      overflow: Overflow.visible,
-                      children: <Widget>[
-                        Positioned(
-                          child: Text(
-                            "70°",
-                            style: timeStyle(SECOND_SIZE, SECOND_COLOR),
-                          ),
-                        ),
-                        Image.network(
-                          "http://openweathermap.org/img/wn/$weatherIconUrl@2x.png",
-                          height: HOUR_SIZE,
-                        ),
-                      ],
-                    ),
-            ),
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "$hours:$minutes",
-                    style: timeStyle(HOUR_SIZE, HOUR_COLOR),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: primaryColor,
+      body: Stack(
+        children: <Widget>[
+          /// Weather Icon
+          Positioned(
+            top: 30.0,
+            right: 0.0,
+            child: weatherIconUrl == null
+                ? CircularProgressIndicator()
+                : Stack(
+                    overflow: Overflow.visible,
                     children: <Widget>[
-                      Text(
-                        ":$seconds",
-                        style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+                      Positioned(
+                        child: Text(
+                          "$temp°",
+                          style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+                        ),
                       ),
-                      Text(
-                        date,
-                        style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+                      Image.network(
+                        "http://openweathermap.org/img/wn/$weatherIconUrl@2x.png",
+                        height: HOUR_SIZE - 15,
                       ),
                     ],
                   ),
-                ],
-              ),
+          ),
+
+          /// Current Timestamp
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "$hours:$minutes",
+                  style: timeStyle(HOUR_SIZE, HOUR_COLOR),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      ":$seconds",
+                      style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+                    ),
+                    Text(
+                      date,
+                      style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            Positioned(
-              bottom: 15.0,
-              left: screenWidth(context, dividedBy: 2, reducedBy: 5.0),
-              child: FlatButton(
-                color: Colors.white,
-                padding: EdgeInsets.all(5.0),
-                child: Icon(Icons.arrow_drop_up),
-                onPressed: () {
-                  showBottomSheet(
-                      context: context,
-                      builder: (context) => Container(
-                            height: screenHeight(context, dividedBy: 4.5),
-                            color: Colors.grey,
-                            padding: EdgeInsets.all(10.0),
-                            child: Center(child: timeSelector()),
-                          ));
-                },
-              ),
+          ),
+
+          /// Display alarm
+          Positioned(
+            top: 30.0,
+            left: 10.0,
+            child: Text(
+              "Alarm at: $alarmAsString",
+              style: timeStyle(12.0, SECOND_COLOR),
             ),
-            Positioned(
-              top: 30.0,
-              left: 10.0,
-              child: Text(
-                "Next alarm at: $alarmAsString",
-                style: timeStyle(12.0, SECOND_COLOR),
-              ),
-            ),
-          ],
-        ),
+          ),
+          timeSelector(),
+        ],
       ),
     );
   }
