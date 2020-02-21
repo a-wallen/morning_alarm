@@ -129,7 +129,8 @@ class _HomePageState extends State<HomePage> {
       builder: (_) {
         return new AlertDialog(
           title: Text("Success"),
-          content: Text("Scheduled an alarm at: ${myhours}:${myminutes}"),
+          content: myminutes < 10 ? Text("Scheduled an alarm at: ${myhours}:0${myminutes}") :
+          Text("Scheduled an alarm at: ${myhours}:${myminutes}"),
         );
       },
     );
@@ -181,6 +182,7 @@ class _HomePageState extends State<HomePage> {
               style: timeStyle(12.0, HOUR_COLOR),
             ),
             IconButton(
+              tooltip: "Scroll up or down get desired time! Press alarm icon to set alarm.",
               iconSize: SECOND_SIZE,
               color: SECOND_COLOR,
               icon: Icon(Icons.access_alarm),
@@ -245,6 +247,7 @@ class _HomePageState extends State<HomePage> {
                       Image.network(
                         "http://openweathermap.org/img/wn/$weatherIconUrl@2x.png",
                         height: HOUR_SIZE - 15,
+                        color: Color.fromRGBO(0, 0, 0, 0.5),
                       ),
                     ],
                   ),
