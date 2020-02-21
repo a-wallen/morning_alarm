@@ -107,13 +107,11 @@ class _HomePageState extends State<HomePage> {
     vibrationPattern[2] = 5000;
     vibrationPattern[3] = 2000;
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-        'your other channel id',
-        'your other channel name',
-        'your other channel description',
-        enableVibration: true,
-        vibrationPattern: vibrationPattern,
-        playSound: true,
-        sound: 'game_ringtone',
+        'your channel id',
+        'your channel name',
+        'your channel description',
+        //vibrationPattern: vibrationPattern,
+        sound: 'video_game_ringtone',
         importance: Importance.Max,
         priority: Priority.Max,
         );
@@ -288,7 +286,12 @@ class _HomePageState extends State<HomePage> {
               style: timeStyle(12.0, SECOND_COLOR),
             ),
           ),
-          timeSelector(),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              timeSelector(),
+            ],
+          ),
         ],
       ),
     );
