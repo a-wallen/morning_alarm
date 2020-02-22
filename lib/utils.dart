@@ -4,8 +4,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 const SCROLL_FACTOR = 1.9;
 const HOUR_SIZE = 96.0;
 const SECOND_SIZE = 32.0;
-const Color HOUR_COLOR = Colors.black54;
-const Color SECOND_COLOR = Colors.redAccent;
+const Color HOUR_COLOR = Colors.white;
+const Color SECOND_COLOR = Colors.white70;
 
 String alarmTitle = 'morning_alarm';
 String alarmBody = 'wake up!';
@@ -25,7 +25,7 @@ TextStyle timeStyle(double size, Color myColor) {
 const primaryColor = const Color(0xFFFFF0BC);
 
 const primaryGradient = const LinearGradient(
-  colors: const [Color(0xFFFD60A3), Color(0xFFFF8961)],
+  colors: const [Color(0xffbb8aAA), Color(0xffe6cfCA)],
   begin: Alignment.topRight,
   end: Alignment.bottomLeft,
 );

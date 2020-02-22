@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
       if (myminutes < 10) {
         alarmAsString = '${myhours}:0${myminutes}';
         alarmForDT = '${myhours}0${myminutes}';
-      }else {
+      } else {
         alarmAsString = '${myhours}:${myminutes}';
         alarmForDT = '${myhours}${myminutes}';
       }
@@ -107,14 +107,15 @@ class _HomePageState extends State<HomePage> {
     vibrationPattern[2] = 5000;
     vibrationPattern[3] = 2000;
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-        'your channel id',
-        'your channel name',
-        'your channel description',
-        //vibrationPattern: vibrationPattern,
-        sound: 'video_game_ringtone',
-        importance: Importance.Max,
-        priority: Priority.Max,
-        );
+      'your channel id',
+      'your channel name',
+      'your channel description',
+      //vibrationPattern: vibrationPattern,
+      // sound: 'video_game_ringtone',
+      playSound: true,
+      importance: Importance.Max,
+      priority: Priority.Max,
+    );
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
     var platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
@@ -129,8 +130,9 @@ class _HomePageState extends State<HomePage> {
       builder: (_) {
         return new AlertDialog(
           title: Text("Success"),
-          content: myminutes < 10 ? Text("Scheduled an alarm at: ${myhours}:0${myminutes}") :
-          Text("Scheduled an alarm at: ${myhours}:${myminutes}"),
+          content: myminutes < 10
+              ? Text("Scheduled an alarm at: ${myhours}:0${myminutes}")
+              : Text("Scheduled an alarm at: ${myhours}:${myminutes}"),
         );
       },
     );
@@ -182,7 +184,8 @@ class _HomePageState extends State<HomePage> {
               style: timeStyle(12.0, HOUR_COLOR),
             ),
             IconButton(
-              tooltip: "Scroll up or down get desired time! Press alarm icon to set alarm.",
+              tooltip:
+                  "Scroll up or down get desired time! Press alarm icon to set alarm.",
               iconSize: SECOND_SIZE,
               color: SECOND_COLOR,
               icon: Icon(Icons.access_alarm),
@@ -226,76 +229,81 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
-      body: Stack(
-        children: <Widget>[
-          /// Weather Icon
-          Positioned(
-            top: 30.0,
-            right: 0.0,
-            child: weatherIconUrl == null
-                ? CircularProgressIndicator()
-                : Stack(
-                    overflow: Overflow.visible,
-                    children: <Widget>[
-                      Positioned(
-                        child: Text(
-                          "$temp°",
-                          style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+//      backgroundColor: primaryColor,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: primaryGradient,
+        ),
+        child: Stack(
+          children: <Widget>[
+            /// Weather Icon
+            Positioned(
+              top: 30.0,
+              right: 0.0,
+              child: weatherIconUrl == null
+                  ? CircularProgressIndicator()
+                  : Stack(
+                      overflow: Overflow.visible,
+                      children: <Widget>[
+                        Positioned(
+                          child: Text(
+                            "$temp°",
+                            style: timeStyle(SECOND_SIZE, SECOND_COLOR),
+                          ),
                         ),
+                        Image.network(
+                          "http://openweathermap.org/img/wn/$weatherIconUrl@2x.png",
+                          height: HOUR_SIZE - 15,
+                          color: Color.fromRGBO(255, 255, 255, 0.5),
+                        ),
+                      ],
+                    ),
+            ),
+
+            /// Current Timestamp
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "$hours:$minutes",
+                    style: timeStyle(HOUR_SIZE, HOUR_COLOR),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        ":$seconds",
+                        style: timeStyle(SECOND_SIZE, SECOND_COLOR),
                       ),
-                      Image.network(
-                        "http://openweathermap.org/img/wn/$weatherIconUrl@2x.png",
-                        height: HOUR_SIZE - 15,
-                        color: Color.fromRGBO(0, 0, 0, 0.5),
+                      Text(
+                        date,
+                        style: timeStyle(SECOND_SIZE, SECOND_COLOR),
                       ),
                     ],
                   ),
-          ),
+                ],
+              ),
+            ),
 
-          /// Current Timestamp
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            /// Display alarm
+            Positioned(
+              top: 30.0,
+              left: 10.0,
+              child: Text(
+                "Alarm at: $alarmAsString",
+                style: timeStyle(12.0, SECOND_COLOR),
+              ),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                Text(
-                  "$hours:$minutes",
-                  style: timeStyle(HOUR_SIZE, HOUR_COLOR),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      ":$seconds",
-                      style: timeStyle(SECOND_SIZE, SECOND_COLOR),
-                    ),
-                    Text(
-                      date,
-                      style: timeStyle(SECOND_SIZE, SECOND_COLOR),
-                    ),
-                  ],
-                ),
+                timeSelector(),
               ],
             ),
-          ),
-
-          /// Display alarm
-          Positioned(
-            top: 30.0,
-            left: 10.0,
-            child: Text(
-              "Alarm at: $alarmAsString",
-              style: timeStyle(12.0, SECOND_COLOR),
-            ),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              timeSelector(),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
