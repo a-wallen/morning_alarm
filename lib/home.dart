@@ -62,9 +62,6 @@ class _HomePageState extends State<HomePage> {
         hours = DateFormat('kk').format(now);
         minutes = DateFormat('mm').format(now);
       });
-//      if ('$alarmAsString:00' == '$hours:$minutes:$seconds') {
-//        _setAlarm(now);
-//      }
     });
   }
 
