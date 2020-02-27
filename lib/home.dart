@@ -48,7 +48,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _getWeather();
-
     //alarm notification plugin initialization
     date = DateFormat('EEE d MMM').format(now);
     seconds = DateFormat('ss').format(now);
@@ -57,7 +56,6 @@ class _HomePageState extends State<HomePage> {
     Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
         now = DateTime.now();
-        //alarmTest = DateTime(now.year, now.month, now.day, now.hour, now.minute+1);
         seconds = DateFormat('ss').format(now);
         hours = DateFormat('kk').format(now);
         minutes = DateFormat('mm').format(now);
