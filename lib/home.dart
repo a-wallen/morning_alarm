@@ -76,6 +76,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // format integer hh:mm alarm time to a DateTime
   void _setAlarmTime() {
     String alarmForDT;
     setState(() {
@@ -88,7 +89,6 @@ class _HomePageState extends State<HomePage> {
       }
     });
     String dateWithT = "${DateFormat('yyyyMMdd').format(now)}T${alarmForDT}00";
-    //print(dateWithT);
     DateTime alarm = DateTime.parse(dateWithT);
     _scheduleAlarm(alarm);
   }
