@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:morning_alarm/utils.dart';
+import 'package:morning_alarm/bottomSheetElements.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:weather/weather.dart';
 import 'dart:typed_data';
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
 
   //var alarm of type time used for local notifications class
   String alarmAsString = '';
+  String alarmMessage = alarmBody;
   int myhours = 0, myminutes = 0;
 
   //current time variables
@@ -118,7 +120,7 @@ class _HomePageState extends State<HomePage> {
 //        0, alarmTitle, alarmBody, platformChannelSpecifics);
     await alarmNotificationPlugin.cancelAll();
     await alarmNotificationPlugin.schedule(
-        0, alarmTitle, alarmBody, t, platformChannelSpecifics);
+        0, alarmTitle, alarmMessage, t, platformChannelSpecifics);
 
     showDialog(
       context: context,
@@ -131,6 +133,8 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+
+    alarmMessage = alarmBody;
   }
 
   /// Updates the hours
@@ -157,6 +161,10 @@ class _HomePageState extends State<HomePage> {
       else
         myminutes -= update;
     });
+  }
+
+  receiveData(String data){
+    alarmMessage = data;
   }
 
   /// Overall time selector widget
@@ -300,6 +308,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+        floatingActionButton: floatingBottomButton(onSaveData: receiveData)
     );
   }
 }

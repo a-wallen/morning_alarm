@@ -3,57 +3,127 @@ import 'package:flutter/material.dart';
 // Credit to Dane Mackier for bottom sheet example
 // https://www.filledstacks.com/post/bottom-sheet-guide-in-flutter/
 
-class BottomSheetWidget extends StatefulWidget {
-  @override
-  _BottomSheetWidgetState createState() => _BottomSheetWidgetState();
-}
-
-class _BottomSheetWidgetState extends State<BottomSheetWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 5, left: 15, right: 15),
-      height: 160,
-      child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: []),
-    );
-  }
-}
-
 class floatingBottomButton extends StatefulWidget {
+  final ValueChanged<String> onSaveData;
+
+  floatingBottomButton({this.onSaveData});
+
   @override
-  _floatingBottomButtonState createState() => _floatingBottomButtonState();
+  _floatingBottomButtonState createState() =>  _floatingBottomButtonState();
+
+
 }
 
 class _floatingBottomButtonState extends State<floatingBottomButton> {
-  bool showFBB = true;
-  @override
-  Widget build(BuildContext context) {
-    return showFBB
-        ? FloatingActionButton(
-            onPressed: () {
-              var bottomSheetController = showBottomSheet(
-                  context: context,
-                  builder: (context) => Container(
-                        color: Colors.grey[900],
-                        height: 250,
-                      ));
+  //bool showFBB = true,
+  bool open = false;
+  Icon buttonSymbol = Icon(Icons.keyboard_arrow_up);
+  String alarmMesg = "";
 
-              showFloatingBottomButton(false);
-
-              bottomSheetController.closed.then((value) {
-                showFloatingBottomButton(true);
-              });
-            },
-          )
-        : Container();
+  saveData(){
+    alarmMesg;
   }
 
-  void showFloatingBottomButton(bool value) {
+  @override
+  Widget build(BuildContext context) {
+    return
+         FloatingActionButton(
+            onPressed: () {
+              if(!open){
+                showBottomSheet(
+                    context: context,
+                    builder: (context) => Container(
+                          color: Colors.blueGrey,
+                          height: 200,
+                      child: alarmMessageTextBox(onPressed: widget.onSaveData),
+                        ));
+                buttonSymbol = Icon(Icons.keyboard_arrow_down);
+
+                //bottomSheetController.closed.then((value) {
+                  //showFloatingBottomButton(true);
+                //});
+                open = true;
+              }else{
+                showBottomSheet(
+                    context: context,
+                    builder: (context) => Container(
+                      color: Colors.grey[900],
+                      height: 0,
+                    ));
+                buttonSymbol = Icon(Icons.keyboard_arrow_up);
+
+
+                open = false;
+              }
+              },
+      child: buttonSymbol,
+          );
+
+  }
+
+
+
+  /*void showFloatingBottomButton(bool value) {
     setState(() {
       showFBB = value;
     });
+  }*/
+}
+
+//source: https://api.flutter.dev/flutter/material/TextField-class.html#material.TextField.2
+//https://stackoverflow.com/questions/53707961/how-to-send-data-through-different-classes-in-different-screens-in-flutter
+
+class alarmMessageTextBox extends StatefulWidget{
+
+  final ValueChanged<String> onPressed;
+
+  alarmMessageTextBox({this.onPressed});
+
+  @override
+  _alarmMessageTextBoxState createState() => _alarmMessageTextBoxState();
+
+}
+
+class _alarmMessageTextBoxState extends State<alarmMessageTextBox> {
+  TextEditingController _controller;
+
+  void initState(){
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  void dispose(){
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _controller,
+      onSubmitted: (String value) async {
+        await showDialog<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: Text ('You set the next alarm message to "$value".'),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    widget.onPressed(value);
+                    Navigator.pop(context); },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: 'Input alarm message you want to see',
+        fillColor: Colors.white
+      ),
+    );
   }
 }
