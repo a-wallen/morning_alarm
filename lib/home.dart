@@ -110,6 +110,7 @@ class _HomePageState extends State<HomePage> {
       //vibrationPattern: vibrationPattern,
       // sound: 'video_game_ringtone',
       playSound: true,
+      //icon: "morning_alarm/assets/app_icon.png",
       importance: Importance.Max,
       priority: Priority.Max,
     );

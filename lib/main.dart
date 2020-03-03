@@ -46,8 +46,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: true,
-        showPerformanceOverlay: true,
+        debugShowCheckedModeBanner: false,
+        showPerformanceOverlay: false,
         title: 'Flutter Demo',
         theme: ThemeData(
           primarySwatch: Colors.blue,
